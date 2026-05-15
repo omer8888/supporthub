@@ -29,12 +29,12 @@ public class JwtService {
         Instant now = Instant.now();
         Instant exp = now.plus(ttlMinutes, ChronoUnit.MINUTES);
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getUsername()) // who
                 .issuedAt(java.util.Date.from(now))
-                .expiration(java.util.Date.from(exp))
-                .claim("roles", List.of("ROLE_" + user.getRole().name()))
+                .expiration(java.util.Date.from(exp)) // when it dies
+                .claim("roles", List.of("ROLE_" + user.getRole().name())) // what they can do
                 .claim("uid", user.getId())
-                .signWith(key(), Jwts.SIG.HS256)
+                .signWith(key(), Jwts.SIG.HS256) // sign with secret
                 .compact();
     }
 
