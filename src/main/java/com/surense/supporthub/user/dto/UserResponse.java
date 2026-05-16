@@ -18,7 +18,7 @@ public record UserResponse(
                 u.getEmail(),
                 u.getFullName(),
                 u.getRole(),
-                u.getAgent() != null ? u.getAgent().getId() : null
+                u.getAgentId()
         );
     }
 }

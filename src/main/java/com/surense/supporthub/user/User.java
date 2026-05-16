@@ -33,9 +33,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agent_id")
-    private User agent;
+    // ID of the agent who owns this user (FK to users.id). Set only when role = CUSTOMER, null otherwise.
+    @Column(name = "agent_id")
+    private Long agentId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

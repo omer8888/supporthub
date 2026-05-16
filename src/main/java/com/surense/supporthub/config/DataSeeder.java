@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+// Runs once at startup. Inserts the admin + agent accounts if they don't exist yet.
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 

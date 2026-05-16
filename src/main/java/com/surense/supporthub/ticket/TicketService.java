@@ -15,6 +15,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
 
+    // The ticket owner is always the caller — a customer can't open a ticket for someone else.
     public Ticket create(CreateTicketRequest req, User caller) {
         if (caller.getRole() != Role.CUSTOMER) {
             throw new ForbiddenException("Only customers can create tickets");
@@ -23,11 +24,12 @@ public class TicketService {
                 .subject(req.subject())
                 .description(req.description())
                 .status(TicketStatus.OPEN)
-                .user(caller)
+                .userId(caller.getId())
                 .build();
         return ticketRepository.save(t);
     }
 
+    // Ownership filter: customer sees own tickets; agent sees their customers' tickets; admin sees all.
     public List<Ticket> list(User caller) {
         return switch (caller.getRole()) {
             case CUSTOMER -> ticketRepository.findByUserId(caller.getId());

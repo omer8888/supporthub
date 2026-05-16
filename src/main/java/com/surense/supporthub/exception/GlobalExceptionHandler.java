@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+// One place that turns any thrown exception into a clean JSON error with the right HTTP status.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

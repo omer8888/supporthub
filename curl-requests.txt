@@ -1,0 +1,89 @@
+==============================================================
+ Customer Support Hub - curl requests (copy-paste into terminal)
+==============================================================
+ App on port 8080 by default. If 8080 busy, start with 8081:
+   SERVER_PORT=8081 ./mvnw spring-boot:run
+ ...then change 8080 -> 8081 in the URLs below.
+
+ Flow: 1) run a LOGIN  2) copy "accessToken" from the reply
+       3) paste it into TOKEN=...  4) run the other requests.
+==============================================================
+
+
+--- 1. LOGIN as agent (public, no token) ---------------------
+curl -X POST http://localhost:8080/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"agent","password":"password"}'
+
+
+--- LOGIN as admin -------------------------------------------
+curl -X POST http://localhost:8080/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"password"}'
+
+
+--- Save token in a shell variable (paste real token) --------
+TOKEN=PASTE_ACCESS_TOKEN_HERE
+
+
+--- 2. CREATE CUSTOMER  (POST /customers, AGENT or ADMIN) ----
+curl -X POST http://localhost:8080/customers \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"cust5","password":"pass1234","email":"cust5@x.com","fullName":"Customer One"}'
+
+# admin must also pass "agentId":
+# -d '{"username":"cust2","password":"pass1234","email":"c2@x.com","fullName":"Customer Two","agentId":2}'
+
+
+--- 3. LIST CUSTOMERS  (GET /customers, AGENT or ADMIN) ------
+curl http://localhost:8080/customers \
+  -H "Authorization: Bearer $TOKEN"
+
+
+--- 4. GET OWN PROFILE  (GET /customers/me, CUSTOMER) --------
+curl http://localhost:8080/customers/me \
+  -H "Authorization: Bearer $TOKEN"
+
+
+--- 5. UPDATE OWN PROFILE  (PUT /customers/me, CUSTOMER) -----
+curl -X PUT http://localhost:8080/customers/me \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"new@x.com","fullName":"Customer One Updated"}'
+
+
+--- 6. UPDATE AGENT PROFILE  (PUT /agents/me, AGENT) ---------
+curl -X PUT http://localhost:8080/agents/me \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"agent-new@x.com","fullName":"Agent Updated"}'
+
+
+--- 7. CREATE TICKET  (POST /tickets, CUSTOMER) --------------
+curl -X POST http://localhost:8080/tickets \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"subject":"Cannot log in","description":"App shows error 500"}'
+
+
+--- 8. LIST TICKETS  (GET /tickets, CUSTOMER/AGENT/ADMIN) ----
+curl http://localhost:8080/tickets \
+  -H "Authorization: Bearer $TOKEN"
+
+
+==============================================================
+ ERROR CHECKS  (-i shows the HTTP status line)
+==============================================================
+
+--- no token -> 401 ------------------------------------------
+curl -i http://localhost:8080/tickets
+
+--- wrong role (customer hits agent endpoint) -> 403 ---------
+curl -i http://localhost:8080/customers \
+  -H "Authorization: Bearer $TOKEN"
+
+--- bad password -> 401 --------------------------------------
+curl -i -X POST http://localhost:8080/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"agent","password":"wrong"}'

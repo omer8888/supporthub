@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Auth is two layers: @PreAuthorize here is the role gate;
+// the service layer then does the ownership check (which rows the caller may see).
 @RestController
 @RequestMapping("/customers")
 @RequiredArgsConstructor

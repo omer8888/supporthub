@@ -1,6 +1,5 @@
 package com.surense.supporthub.ticket;
 
-import com.surense.supporthub.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,9 +28,9 @@ public class Ticket {
     @Column(nullable = false)
     private TicketStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    // ID of the customer who opened the ticket (FK to users.id).
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

@@ -24,7 +24,7 @@ class TicketServiceTest {
     @InjectMocks TicketService ticketService;
 
     private User customer(long id, User agent) {
-        return User.builder().id(id).username("c" + id).role(Role.CUSTOMER).agent(agent).build();
+        return User.builder().id(id).username("c" + id).role(Role.CUSTOMER).agentId(agent.getId()).build();
     }
 
     private User agent(long id) {
@@ -39,7 +39,7 @@ class TicketServiceTest {
 
         Ticket saved = ticketService.create(req, c);
 
-        assertThat(saved.getUser()).isSameAs(c);
+        assertThat(saved.getUserId()).isEqualTo(c.getId());
         assertThat(saved.getSubject()).isEqualTo("Help");
         assertThat(saved.getStatus()).isEqualTo(TicketStatus.OPEN);
     }

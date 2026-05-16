@@ -43,7 +43,7 @@ class UserServiceTest {
         User saved = userService.createCustomer(req, agent);
 
         assertThat(saved.getRole()).isEqualTo(Role.CUSTOMER);
-        assertThat(saved.getAgent()).isSameAs(agent);
+        assertThat(saved.getAgentId()).isEqualTo(agent.getId());
         assertThat(saved.getPassword()).isEqualTo("HASH");
     }
 
@@ -59,7 +59,7 @@ class UserServiceTest {
 
         User saved = userService.createCustomer(req, admin);
 
-        assertThat(saved.getAgent()).isSameAs(targetAgent);
+        assertThat(saved.getAgentId()).isEqualTo(targetAgent.getId());
     }
 
     @Test
@@ -77,7 +77,7 @@ class UserServiceTest {
     @Test
     void getCustomersForCurrentUser_asAgent_returnsOnlyOwnCustomers() {
         User agent = agent(7L);
-        User mine = User.builder().id(100L).role(Role.CUSTOMER).agent(agent).build();
+        User mine = User.builder().id(100L).role(Role.CUSTOMER).agentId(agent.getId()).build();
         when(userRepository.findByAgentId(7L)).thenReturn(List.of(mine));
 
         List<User> result = userService.listCustomers(agent);

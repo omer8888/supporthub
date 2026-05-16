@@ -19,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // Reads the logged-in username from the JWT (via SecurityContext) and loads the User entity.
     public User currentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username)
@@ -36,11 +37,13 @@ public class UserService {
                 .email(req.email())
                 .fullName(req.fullName())
                 .role(Role.CUSTOMER)
-                .agent(agent)
+                .agentId(agent.getId())
                 .build();
         return userRepository.save(customer);
     }
 
+    // Decides which agent owns the new customer:
+    // AGENT caller -> themselves. ADMIN caller -> the agentId they passed in the request.
     private User resolveAgent(User caller, Long agentId) {
         if (caller.getRole() == Role.AGENT) return caller;
         if (caller.getRole() == Role.ADMIN) {
@@ -53,14 +56,16 @@ public class UserService {
         throw new ForbiddenException("Cannot create customer");
     }
 
+    // Ownership filter: an agent sees only their own customers; an admin sees all.
     public List<User> listCustomers(User caller) {
         return switch (caller.getRole()) {
-            case AGENT -> userRepository.findByAgentId(caller.getId());
-            case ADMIN -> userRepository.findByRole(Role.CUSTOMER);
+            case AGENT -> userRepository.findByAgentId(caller.getId()); // agent: only his
+            case ADMIN -> userRepository.findByRole(Role.CUSTOMER); // admin: all
             default -> throw new ForbiddenException("Cannot list customers");
         };
     }
 
+    //email and full name update
     public User updateProfile(User caller, UpdateProfileRequest req) {
         if (req.email() != null) caller.setEmail(req.email());
         if (req.fullName() != null) caller.setFullName(req.fullName());

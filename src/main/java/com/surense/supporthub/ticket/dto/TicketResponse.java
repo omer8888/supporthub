@@ -20,7 +20,7 @@ public record TicketResponse(
                 t.getSubject(),
                 t.getDescription(),
                 t.getStatus(),
-                t.getUser().getId(),
+                t.getUserId(),
                 t.getCreatedAt(),
                 t.getUpdatedAt()
         );
